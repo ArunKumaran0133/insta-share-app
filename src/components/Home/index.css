@@ -1,0 +1,49 @@
+.heme-main-container {
+  padding-left: 5%;
+  padding-right: 5%;
+  min-height: 100vh;
+  flex-shrink: 0;
+  background: #fafafa;
+  padding-top: 30px;
+}
+
+.post-details-list-container {
+  padding-left: 0px;
+  list-style: none;
+}
+
+.loader-stories {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-post {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.failure-message-post {
+  color: #262626;
+  font-family: Roboto;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px; /* 150% */
+}
+
+@media screen and (max-width: 576px) {
+  .heme-main-container {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .story-slider-container {
+    margin-right: 30px;
+    margin-left: 30px;
+  }
+}
