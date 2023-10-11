@@ -169,7 +169,7 @@ class Home extends Component {
   }
 
   renderPostSuccessView = () => {
-    const {postDetailsList, isPostLiked} = this.state
+    const {postDetailsList} = this.state
     return (
       <ul className="post-details-list-container">
         {postDetailsList.map(eachItem => (
@@ -177,7 +177,6 @@ class Home extends Component {
             key={eachItem.postId}
             postDetail={eachItem}
             onLikePost={this.onLikePost}
-            isPostLiked={isPostLiked}
           />
         ))}
       </ul>

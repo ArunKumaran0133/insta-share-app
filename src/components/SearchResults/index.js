@@ -68,13 +68,58 @@ class SearchResults extends Component {
               userName: eachItem.comments[1].user_name,
             },
           ],
+          isPostLiked: false,
         }))
         this.setState({
           postDetailsList: formattedData,
           apiStatus: apiStatusObj.success,
+          userSearchInput: '',
         })
       }
     }
+  }
+
+  onLikePost = async postId => {
+    this.setState(prevState => ({
+      postDetailsList: prevState.postDetailsList.map(eachItem => {
+        if (eachItem.postId === postId) {
+          if (eachItem.isPostLiked === false) {
+            const updateLikeCount = eachItem.likesCount + 1
+            const updateIsLikePost = !eachItem.isPostLiked
+            return {
+              ...eachItem,
+              isPostLiked: updateIsLikePost,
+              likesCount: updateLikeCount,
+            }
+          }
+          const updateLikeCount = eachItem.likesCount - 1
+          const updateIsLikePost = !eachItem.isPostLiked
+          return {
+            ...eachItem,
+            isPostLiked: updateIsLikePost,
+            likesCount: updateLikeCount,
+          }
+        }
+        return eachItem
+      }),
+    }))
+
+    const {postDetailsList} = this.state
+    const {isPostLiked} = postDetailsList
+
+    const jwtToken = Cookies.get('jwt_token')
+    const likeStatus = {like_status: isPostLiked}
+    const url = `https://apis.ccbp.in/insta-share/posts/${postId}/like`
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify(likeStatus),
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    console.log(data)
   }
 
   renderSuccessView = () => {
@@ -82,7 +127,11 @@ class SearchResults extends Component {
     return (
       <ul className="post-details-list-container">
         {postDetailsList.map(eachItem => (
-          <PostDetails key={eachItem.postId} postDetail={eachItem} />
+          <PostDetails
+            key={eachItem.postId}
+            postDetail={eachItem}
+            onLikePost={this.onLikePost}
+          />
         ))}
       </ul>
     )
@@ -136,6 +185,7 @@ class SearchResults extends Component {
   }
 
   render() {
+    const {userSearchInput} = this.state
     return (
       <>
         <Header />
@@ -146,6 +196,7 @@ class SearchResults extends Component {
               className="search-input"
               onChange={this.onGetSearchInput}
               placeholder="Search Caption"
+              value={userSearchInput}
             />
             <button
               type="button"
