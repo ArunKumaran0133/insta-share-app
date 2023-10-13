@@ -4,7 +4,6 @@ import './index.css'
 import {BsHeart} from 'react-icons/bs'
 import {FaRegComment} from 'react-icons/fa'
 import {BiShareAlt} from 'react-icons/bi'
-import {AiFillHeart} from 'react-icons/ai'
 
 const PostDetails = props => {
   const {postDetail, onLikePost} = props
@@ -20,10 +19,6 @@ const PostDetails = props => {
     isPostLiked,
   } = postDetail
 
-  console.log(isPostLiked)
-
-  const icon = isPostLiked ? <AiFillHeart color="#F05161" /> : <BsHeart />
-
   const likeBtn = () => {
     onLikePost(postId, isPostLiked)
   }
@@ -31,52 +26,75 @@ const PostDetails = props => {
   return (
     <li className="post-detail-container">
       <div className="user-pic-container">
-        <img src={profilePic} alt={userName} className="profile-pic-post" />
-        <Link to={`/user-profile/${userId}`} className="link">
-          <h1 className="user-name-post">{userName}</h1>
+        <img
+          src={profilePic}
+          alt="post author profile"
+          className="profile-pic-post"
+        />
+        <Link to={`/users/${userId}`} className="link">
+          <p className="user-name-post">{userName}</p>
         </Link>
       </div>
 
-      <img
-        src={postDetails.imageUrl}
-        alt={postDetails.caption}
-        className="post-image-url"
-      />
+      <img src={postDetails.imageUrl} alt="post" className="post-image-url" />
       <div className="comments-container">
-        <div className="buttons-container-post">
-          <button
-            type="button"
-            className="post-button-items"
-            data-testid="like-button"
-            onClick={likeBtn}
-          >
-            {icon}
-          </button>
-          <button
-            type="button"
-            className="post-button-items"
-            data-testid="comment-button"
-          >
-            <FaRegComment />
-          </button>
-          <button
-            type="button"
-            className="post-button-items"
-            data-testid="share-button"
-          >
-            <BiShareAlt />
-          </button>
-        </div>
+        <ul className="buttons-container-post">
+          <li>
+            {isPostLiked ? (
+              <button
+                type="button"
+                className="post-button-items"
+                data-testid="likeIcon"
+                onClick={likeBtn}
+              >
+                <BsHeart testid="likeIcon" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="post-button-items"
+                data-testid="unLikeIcon"
+                onClick={likeBtn}
+              >
+                <BsHeart color="#F05161" testid="unLikeIcon" />
+              </button>
+            )}
+          </li>
+          <li>
+            <button
+              type="button"
+              className="post-button-items"
+              data-testid="commentIcon"
+            >
+              <FaRegComment />
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="post-button-items"
+              data-testid="shareIcon"
+            >
+              <BiShareAlt />
+            </button>
+          </li>
+        </ul>
         <p className="post-like">{likesCount} Likes</p>
         <p className="post-caption">{postDetails.caption}</p>
-        <p className="post-comment">
-          {comments[0].userName}{' '}
-          <span className="span">{comments[0].comment}</span>
-        </p>
-        <p className="post-comment">
-          {comments[1].userName}{' '}
-          <span className="span">{comments[1].comment}</span>
-        </p>
+        <ul className="comment-list-container">
+          <li className="comment-container">
+            <Link to={`/users/${userId}`} className="link comment">
+              <span className="post-comment">{comments[0].userName} </span>
+              <p className="span">{comments[0].comment}</p>
+            </Link>
+          </li>
+          <li className="comment-container">
+            <Link to={`/users/${userId}`} className="link comment">
+              <span className="post-comment">{comments[1].userName}</span>
+              <p className="span">{comments[1].comment}</p>
+            </Link>
+          </li>
+        </ul>
         <p className="post-created-at">{createdAt}</p>
       </div>
     </li>

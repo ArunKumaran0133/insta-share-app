@@ -1,7 +1,6 @@
-import Slider from 'react-slick'
 import {FaArrowAltCircleRight, FaArrowAltCircleLeft} from 'react-icons/fa'
-import 'slick-carousel/slick/slick.css'
-import 'slick-carousel/slick/slick-theme.css'
+
+import Slider from 'react-slick'
 
 import StoryItem from '../StoryItem'
 
@@ -13,6 +12,7 @@ const StorySlider = props => {
     dots: false,
     nextArrow: <FaArrowAltCircleRight color="black" />,
     prevArrow: <FaArrowAltCircleLeft color="#E5E5E5" />,
+    slidecount: false,
     responsive: [
       {
         breakpoint: 1024,
@@ -40,7 +40,7 @@ const StorySlider = props => {
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 3,
           slidesToScroll: 1,
         },
       },
@@ -48,11 +48,13 @@ const StorySlider = props => {
   }
   return (
     <>
-      <Slider {...settings}>
-        {storyList.map(eachItem => (
-          <StoryItem storyDetail={eachItem} key={eachItem.userId} />
-        ))}
-      </Slider>
+      <ul>
+        <Slider {...settings}>
+          {storyList.map(eachItem => (
+            <StoryItem storyDetail={eachItem} key={eachItem.userId} />
+          ))}
+        </Slider>
+      </ul>
     </>
   )
 }

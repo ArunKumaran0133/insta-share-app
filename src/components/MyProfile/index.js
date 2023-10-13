@@ -1,232 +1,167 @@
+/* eslint-disable react/no-unknown-property */
 import {Component} from 'react'
+import Loader from 'react-loader-spinner'
 import Cookies from 'js-cookie'
 import {BsGrid3X3} from 'react-icons/bs'
 import {BiCamera} from 'react-icons/bi'
-import Loader from 'react-loader-spinner'
-
 import Header from '../Header'
 import './index.css'
 
-const apiStatusObj = {
+const apiStatusConstants = {
   initial: 'INITIAL',
   success: 'SUCCESS',
   failure: 'FAILURE',
   inProgress: 'IN_PROGRESS',
 }
 
-class UserProfile extends Component {
-  state = {
-    MyProfileData: [],
-    storiesList: [],
-    postsList: [],
-    apiStatus: apiStatusObj.initial,
-  }
+class MyProfile extends Component {
+  state = {apiStatus: apiStatusConstants.initial, myProfileData: []}
 
   componentDidMount() {
-    this.getMyDetails()
+    this.getMyProfileData()
   }
 
-  getMyDetails = async () => {
-    this.setState({apiStatus: apiStatusObj.inProgress})
+  getMyProfileData = async () => {
+    this.setState({apiStatus: apiStatusConstants.inProgress})
     const jwtToken = Cookies.get('jwt_token')
-    const url = 'https://apis.ccbp.in/insta-share/my-profile'
+    const apiUrl = `https://apis.ccbp.in/insta-share/my-profile`
     const options = {
-      method: 'GET',
       headers: {
         Authorization: `Bearer ${jwtToken}`,
       },
+      method: 'GET',
     }
-
-    const response = await fetch(url, options)
-    const data = await response.json()
-    if (response.ok) {
-      const formattedData = {
+    const response = await fetch(apiUrl, options)
+    if (response.ok === true) {
+      const data = await response.json()
+      console.log(data.profile)
+      const updatedData = {
         followersCount: data.profile.followers_count,
         followingCount: data.profile.following_count,
         id: data.profile.id,
-        profilePic: data.profile.profile_pic,
+        posts: data.profile.posts,
         postsCount: data.profile.posts_count,
-        userBio: data.profile.user_bio,
+        profilePic: data.profile.profile_pic,
+        stories: data.profile.stories,
         userId: data.profile.user_id,
         userName: data.profile.user_name,
+        userBio: data.profile.user_bio,
       }
-      const formatStoriesList = data.profile.stories.map(eachStories => ({
-        id: eachStories.id,
-        image: eachStories.image,
-      }))
-
-      const formatPostList = data.profile.posts.map(eachPost => ({
-        id: eachPost.id,
-        image: eachPost.image,
-      }))
-
+      console.log(updatedData)
       this.setState({
-        MyProfileData: formattedData,
-        storiesList: formatStoriesList,
-        postsList: formatPostList,
-        apiStatus: apiStatusObj.success,
+        myProfileData: updatedData,
+        apiStatus: apiStatusConstants.success,
       })
     } else {
-      this.setState({apiStatus: apiStatusObj.failure})
+      this.setState({apiStatus: apiStatusConstants.failure})
     }
   }
 
-  reRenderApi = () => {
-    this.getMyDetails()
-  }
-
-  renderInProgressView = () => (
-    <div data-testid="loader" className="loader">
-      <Loader color="#4094EF" type="TailSpin" />
-    </div>
-  )
-
   renderSuccessView = () => {
-    const {MyProfileData, storiesList} = this.state
+    const {myProfileData} = this.state
     const {
-      profilePic,
-      userName,
       followersCount,
-      postsCount,
       followingCount,
-      userId,
+
       userBio,
-    } = MyProfileData
+      userId,
+      userName,
+      stories,
+      posts,
+      postsCount,
+      profilePic,
+    } = myProfileData
     return (
-      <>
-        <div className="user-profile-container">
-          <div className="small-device-user-details-container">
-            <h1 className="username-small-device">{userName}</h1>
-            <div className="user-detail-container-small">
-              <img
-                src={profilePic}
-                alt={userName}
-                className="small-device-user-pic"
-              />
-              <div className="user-description-container-profile">
-                <p className="posts-count-text">
-                  {postsCount} <br />
-                  <span className="span">Posts</span>
-                </p>
-                <p className="posts-count-text">
-                  {followersCount} <br />{' '}
-                  <span className="span">Followers</span>
-                </p>
-                <p className="posts-count-text">
-                  {followingCount} <br />{' '}
-                  <span className="span">Following</span>
-                </p>
-              </div>
+      <div className="main_container">
+        <div className="my_profile_large_container">
+          <img src={profilePic} alt="my profile" className="myProfilePic" />
+          <div className="my_profile_div">
+            <h1 className="myProfileName">{userName}</h1>
+            <div className="count_div">
+              <p className="text">
+                <span className="count">{postsCount} </span>
+                posts
+              </p>
+              <p className="text">
+                <span className="count">{followersCount} </span>
+                followers
+              </p>
+              <p className="text">
+                <span className="count">{followingCount} </span>
+                following
+              </p>
             </div>
-            <div>
-              <h1 className="profile-user-id">{userId}</h1>
-              <p className="profile-user-bio">{userBio}</p>
-            </div>
+            <p className="my_profile_user_id">{userId}</p>
+            <p className="my_profile_bioText">{userBio}</p>
           </div>
-          <div className="user-details-container">
-            <img src={profilePic} alt={userName} className="user-profile-pic" />
-            <div>
-              <h1 className="user-name-user-profile">{userName}</h1>
-              <div className="user-description-container-profile">
-                <p className="posts-count-text">
-                  {postsCount} <span className="span">Posts</span>
-                </p>
-                <p className="posts-count-text">
-                  {followersCount} <span className="span">Followers</span>
-                </p>
-                <p className="posts-count-text">
-                  {followingCount} <span className="span">Following</span>
-                </p>
-              </div>
-              <h1 className="profile-user-id">{userId}</h1>
-              <p className="profile-user-bio">{userBio}</p>
-            </div>
-          </div>
-          <ul className="stories-list-profile">
-            {storiesList.map(eachStories => (
-              <li key={eachStories.id}>
+        </div>
+
+        <ul className="my_profile_stories_container">
+          {stories.map(eachStory => (
+            <li key={eachStory.id}>
+              <img src={eachStory.image} alt="my story" className="storyImg" />
+            </li>
+          ))}
+        </ul>
+        <div className="posts_heading_div">
+          <BsGrid3X3 className="gridIcon" />
+          <h1 className="posts_heading">Posts</h1>
+        </div>
+        {posts.length > 0 ? (
+          <ul className="my_profile_posts_container">
+            {posts.map(eachPost => (
+              <li key={eachPost.id}>
                 <img
-                  src={eachStories.image}
-                  alt={eachStories.id}
-                  className="profile-stories-image"
+                  src={eachPost.image}
+                  alt="my post"
+                  className="my_profile_post"
                 />
               </li>
             ))}
           </ul>
-          <div>
-            <div className="post-icon-container">
-              <BsGrid3X3 />
-              <p className="posts-text">Posts</p>
-            </div>
+        ) : (
+          <div className="my_profile_no_post_div">
+            <BiCamera className="cameraIcon" />
+            <h1 className="no_posts_heading">No Posts Yet</h1>
           </div>
-          {this.renderPostResultView()}
-        </div>
-      </>
+        )}
+      </div>
     )
   }
 
-  renderNoPostView = () => (
-    <div className="no-post-view-container">
-      <div className="camera-container">
-        <BiCamera />
-      </div>
-      <p className="no-post-text">No Posts Yet</p>
+  renderLoadingView = () => (
+    <div className="user-story-loader-container" testid="loader">
+      <Loader type="TailSpin" color="#4094EF" height={50} width={50} />
     </div>
   )
 
-  renderPostsView = () => {
-    const {postsList} = this.state
-    return (
-      <ul className="post-list-container">
-        {postsList.map(eachPost => (
-          <li key={eachPost.id}>
-            <img
-              src={eachPost.image}
-              alt={eachPost.id}
-              className="post-image"
-            />
-          </li>
-        ))}
-      </ul>
-    )
-  }
-
-  renderPostResultView = () => {
-    const {postsList} = this.state
-    if (postsList.length === 0) {
-      return this.renderNoPostView()
-    }
-    return this.renderPostsView()
-  }
-
   renderFailureView = () => (
-    <div className="failure-view-container">
+    <div className="failure_view_container">
       <img
-        src="https://res.cloudinary.com/dg3h5bne2/image/upload/v1696838588/b9yyjr0gxy4yrfkfljuc.png"
-        alt="failure"
-        className="failure-image"
+        className="my_profile_failure_img"
+        src="https://res.cloudinary.com/dziwdneks/image/upload/v1675454266/HomeFaillureImg_qz05si.png"
+        alt="failure view"
       />
-      <p className="failure-message">Something went wrong. Please try again</p>
+      <p className="failure_heading">Something went wrong. Please try again</p>
       <button
-        type="button"
+        onClick={() => this.getMyProfileData()}
+        type="submit"
         className="failure-button"
-        onClick={this.reRenderApi}
       >
-        Try Again
+        Try again
       </button>
     </div>
   )
 
-  renderResultView = () => {
+  renderMyProfile = () => {
     const {apiStatus} = this.state
-
     switch (apiStatus) {
-      case apiStatusObj.inProgress:
-        return this.renderInProgressView()
-      case apiStatusObj.success:
-        return this.renderSuccessView()
-      case apiStatusObj.failure:
+      case apiStatusConstants.inProgress:
+        return this.renderLoadingView()
+      case apiStatusConstants.failure:
         return this.renderFailureView()
+      case apiStatusConstants.success:
+        return this.renderSuccessView()
       default:
         return null
     }
@@ -234,12 +169,11 @@ class UserProfile extends Component {
 
   render() {
     return (
-      <>
+      <div className="my_profile_container">
         <Header />
-        {this.renderResultView()}
-      </>
+        {this.renderMyProfile()}
+      </div>
     )
   }
 }
-
-export default UserProfile
+export default MyProfile

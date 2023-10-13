@@ -1,12 +1,26 @@
 import React from 'react'
 
+const apiStatusObj = {
+  initial: 'INITIAL',
+  success: 'SUCCESS',
+  failure: 'FAILURE',
+  inProgress: 'IN_PROGRESS',
+}
+
 const instaShareContext = React.createContext({
-  isHomeButtonClicked: true,
-  isSearchButtonClicked: false,
-  isProfileButtonClicked: false,
+  activeTab: 'Home',
   isHomeBtnClicked: () => {},
-  isSearchBtnClicked: () => {},
   isProfileBtnClicked: () => {},
+  getSearchList: () => {},
+  searchList: [],
+  isSearchBtnClicked: false,
+  searchResultApiStatus: apiStatusObj.initial,
+  success: () => {},
+  failure: () => {},
+  loading: () => {},
+  getSearchBtnClicked: () => {},
+  searchButtonSmall: () => {},
+  isSearchButtonSmall: false,
 })
 
 export default instaShareContext

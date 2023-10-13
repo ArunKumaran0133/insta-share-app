@@ -6,12 +6,12 @@ const StoryItem = props => {
   const {storyDetail} = props
   const {userName, storyUrl, userId} = storyDetail
   return (
-    <div className="story-container">
+    <li className="story-container">
       <img src={storyUrl} alt="user story" className="story-image" />
-      <Link to={`/user-profile/${userId}`} className="link">
+      <Link to={`/users/${userId}`} className="link">
         <h1 className="user-name">{userName}</h1>
       </Link>
-    </div>
+    </li>
   )
 }
 

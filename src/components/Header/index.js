@@ -4,12 +4,13 @@ import {Component} from 'react'
 
 import {GiHamburgerMenu} from 'react-icons/gi'
 import {AiFillCloseCircle} from 'react-icons/ai'
+import {FaSearch} from 'react-icons/fa'
 
 import instaShareContext from '../../context/instaShareContext'
 import './index.css'
 
 class Header extends Component {
-  state = {isMenuOpen: false}
+  state = {isMenuOpen: false, searchInput: ''}
 
   openMenu = () => {
     this.setState({isMenuOpen: true})
@@ -28,70 +29,31 @@ class Header extends Component {
   renderMenuItems = () => (
     <instaShareContext.Consumer>
       {value => {
-        const {
-          isHomeButtonClicked,
-          isSearchButtonClicked,
-          isProfileButtonClicked,
-          isHomeBtnClicked,
-          isSearchBtnClicked,
-          isProfileBtnClicked,
-        } = value
-
-        const isHome = () => {
-          isHomeBtnClicked()
-        }
-
-        const isProfile = () => {
-          isProfileBtnClicked()
-        }
+        const {searchButtonSmall} = value
 
         const isSearch = () => {
-          isSearchBtnClicked()
+          searchButtonSmall()
+          const {history} = this.props
+          history.replace('/')
         }
-
-        const classHomeName = isHomeButtonClicked
-          ? `nav-button active-class`
-          : 'nav-button'
-
-        const classSearchName = isSearchButtonClicked
-          ? `nav-button active-class`
-          : 'nav-button'
-
-        const classProfileName = isProfileButtonClicked
-          ? `nav-button active-class`
-          : 'nav-button'
 
         return (
           <ul className="menu-items-list-container">
             <li>
               <Link to="/">
-                <button
-                  type="button"
-                  className={classHomeName}
-                  onClick={isHome}
-                >
+                <button type="button" className="nav-button">
                   Home
                 </button>
               </Link>
             </li>
             <li>
-              <Link to="/search-results">
-                <button
-                  type="button"
-                  className={classSearchName}
-                  onClick={isSearch}
-                >
-                  Search
-                </button>
-              </Link>
+              <button type="button" className="nav-button" onClick={isSearch}>
+                Search
+              </button>
             </li>
             <li>
               <Link to="/my-profile">
-                <button
-                  type="button"
-                  className={classProfileName}
-                  onClick={isProfile}
-                >
+                <button type="button" className="nav-button">
                   Profile
                 </button>
               </Link>
@@ -124,8 +86,8 @@ class Header extends Component {
     const {isMenuOpen} = this.state
     return (
       <>
-        <div className="small-device-header">
-          <div className="small-logo-container">
+        <ul className="small-device-header">
+          <li className="small-logo-container">
             <Link to="/" className="logo-container-header">
               <img
                 src="https://res.cloudinary.com/dg3h5bne2/image/upload/v1696597799/hzxukcatx98oofzd8zzj.png"
@@ -134,15 +96,17 @@ class Header extends Component {
               />
               <h1 className="small-header-heading">Insta Share</h1>
             </Link>
-          </div>
-          <button
-            type="button"
-            className="header-menu-button"
-            onClick={this.openMenu}
-          >
-            <GiHamburgerMenu />
-          </button>
-        </div>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="header-menu-button"
+              onClick={this.openMenu}
+            >
+              <GiHamburgerMenu />
+            </button>
+          </li>
+        </ul>
         {isMenuOpen ? this.renderMenuItems() : null}
       </>
     )
@@ -151,38 +115,74 @@ class Header extends Component {
   renderLargeDevice = () => (
     <instaShareContext.Consumer>
       {value => {
+        const {searchInput} = this.state
         const {
-          isHomeButtonClicked,
-          isSearchButtonClicked,
-          isProfileButtonClicked,
-          isHomeBtnClicked,
-          isSearchBtnClicked,
-          isProfileBtnClicked,
+          activeTab,
+          getSearchList,
+          success,
+          failure,
+          loading,
+          getSearchBtnClicked,
         } = value
 
-        const isHome = () => {
-          isHomeBtnClicked()
+        const classSearchName =
+          activeTab === 'Search' ? `nav-button active-class` : 'nav-button'
+
+        const classProfileName =
+          activeTab === 'Profile' ? `nav-button active-class` : 'nav-button'
+
+        const getSearchInputHeader = event => {
+          this.setState({searchInput: event.target.value})
         }
 
-        const isProfile = () => {
-          isProfileBtnClicked()
+        const clickedSearchBtn = async () => {
+          getSearchBtnClicked()
+          loading()
+          const jwtToken = Cookies.get('jwt_token')
+          const url = `https://apis.ccbp.in/insta-share/posts?search=${searchInput}`
+          const options = {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${jwtToken}`,
+            },
+          }
+
+          const response = await fetch(url, options)
+
+          if (response.ok) {
+            const data = await response.json()
+            const formattedData = data.posts.map(eachItem => ({
+              createdAt: eachItem.created_at,
+              likesCount: eachItem.likes_count,
+              postDetails: {
+                caption: eachItem.post_details.caption,
+                imageUrl: eachItem.post_details.image_url,
+              },
+              postId: eachItem.post_id,
+              profilePic: eachItem.profile_pic,
+              userId: eachItem.user_id,
+              userName: eachItem.user_name,
+              comments: [
+                {
+                  comment: eachItem.comments[0].comment,
+                  userId: eachItem.comments[0].user_id,
+                  userName: eachItem.comments[0].user_name,
+                },
+                {
+                  comment: eachItem.comments[1].comment,
+                  userId: eachItem.comments[1].user_id,
+                  userName: eachItem.comments[1].user_name,
+                },
+              ],
+              isPostLiked: false,
+            }))
+            success()
+            getSearchList(formattedData)
+            this.setState({searchInput: ''})
+          } else {
+            failure()
+          }
         }
-
-        const isSearch = () => {
-          isSearchBtnClicked()
-        }
-
-        const classHomeName = isHomeButtonClicked
-          ? `nav-button active-class`
-          : 'nav-button'
-
-        const classSearchName = isSearchButtonClicked
-          ? `nav-button active-class`
-          : 'nav-button'
-
-        const classProfileName = isProfileButtonClicked
-          ? `nav-button active-class`
-          : 'nav-button'
 
         return (
           <div className="header-container">
@@ -195,33 +195,37 @@ class Header extends Component {
               <h1 className="header-heading">Insta Share</h1>
             </Link>
             <ul className="nav-list-container">
-              <Link to="/">
+              <li className="header-input-container">
+                <input
+                  type="search"
+                  className="header-input"
+                  placeholder="Search Caption"
+                  onChange={getSearchInputHeader}
+                  value={searchInput}
+                />
                 <button
                   type="button"
-                  className={classHomeName}
-                  onClick={isHome}
+                  className="header-icon-container"
+                  onClick={clickedSearchBtn}
+                  data-testid="searchIcon"
                 >
-                  Home
+                  <FaSearch />
                 </button>
-              </Link>
-              <Link to="/search-results">
-                <button
-                  type="button"
-                  className={classSearchName}
-                  onClick={isSearch}
-                >
-                  Search
-                </button>
-              </Link>
-              <Link to="/my-profile">
-                <button
-                  type="button"
-                  className={classProfileName}
-                  onClick={isProfile}
-                >
-                  Profile
-                </button>
-              </Link>
+              </li>
+              <li>
+                <Link to="/">
+                  <button type="button" className={classSearchName}>
+                    Home
+                  </button>
+                </Link>
+              </li>
+              <li>
+                <Link to="/my-profile">
+                  <button type="button" className={classProfileName}>
+                    Profile
+                  </button>
+                </Link>
+              </li>
               <li>
                 <button
                   type="button"

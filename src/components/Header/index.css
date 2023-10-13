@@ -100,6 +100,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  border-width: 0px;
 }
 .logo-container-header {
   display: flex;
@@ -118,6 +119,8 @@
   justify-content: space-between;
   padding-left: 5%;
   padding-right: 5%;
+  list-style: none;
+  padding-left: 0px;
 }
 
 .header-menu-button {
@@ -178,7 +181,7 @@
   justify-content: center;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 768px) {
   .small-device-header {
     display: none;
   }
@@ -192,5 +195,8 @@
     padding-left: 5%;
     padding-right: 5%;
     align-items: center;
+  }
+  .menu-items-list-container {
+    display: none;
   }
 }
